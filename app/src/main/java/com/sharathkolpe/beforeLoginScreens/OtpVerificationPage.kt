@@ -122,7 +122,7 @@ fun VerifiedAnimation() {
 
 
         val lottieUrl =
-            "https://firebasestorage.googleapis.com/v0/b/gootoo-13293.firebasestorage.app/o/Animations%2Fotp_veriied.json?alt=media&token=32797062-eedc-48f8-82b3-2d88ed197ce5"
+            "https://firebasestorage.googleapis.com/v0/b/gootoo-13293.firebasestorage.app/o/Animations%2Fapp_successful.json?alt=media&token=6443a213-4835-4043-bdd4-cd0054b7e3a3"
         val composition by rememberLottieComposition(LottieCompositionSpec.Url(lottieUrl))
 
 
@@ -133,13 +133,13 @@ fun VerifiedAnimation() {
                 LottieAnimation(
                     composition = composition,
                     iterations = LottieConstants.IterateForever,
-                    modifier = Modifier.size(200.dp)
+                    modifier = Modifier.size(300.dp)
                 )
                 Text(
                     "OTP Verified",
-                    modifier = Modifier.fillMaxWidth().shimmer(),
+                    modifier = Modifier.fillMaxWidth(),
                     textAlign = TextAlign.Center,
-                    color = Color.Green,
+                    color = gootooThemeBlue,
                     fontSize = 30.sp,
                     fontWeight = FontWeight.Bold,
                     fontFamily = poppinsFontFamily

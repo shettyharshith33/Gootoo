@@ -101,7 +101,7 @@ dependencies {
     implementation (libs.firebase.dynamic.links.ktx)
     implementation (libs.accompanist.pager)
 
-    implementation(libs.androidx.material3.v131) // or latest
+
 
     implementation(libs.compose.shimmer)
     implementation (libs.coil.compose)
@@ -117,6 +117,9 @@ dependencies {
     implementation("com.google.android.gms:play-services-auth-api-phone:18.2.0")
 
     implementation("com.google.firebase:firebase-storage-ktx:21.0.2")
+
+    implementation("androidx.compose.material3:material3:1.3.2")
+// or latest stable
 
 
 

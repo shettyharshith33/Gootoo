@@ -4,10 +4,12 @@ package com.sharathkolpe.beforeLoginScreens
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontFamily
@@ -17,8 +19,10 @@ import androidx.navigation.NavController
 import com.airbnb.lottie.compose.*
 import com.google.firebase.auth.FirebaseAuth
 import com.sharathkolpe.gootoo.R
+import com.sharathkolpe.gootoo.ui.theme.gootooThemeBlue
 import com.sharathkolpe.utils.BeforeLoginScreensNavigationObject
 import com.sharathkolpe.gootoo.ui.theme.newGreen
+import com.sharathkolpe.gootoo.ui.theme.poppinsFontFamily
 import com.sharathkolpe.gootoo.ui.theme.themeBlue
 
 @Composable
@@ -73,7 +77,7 @@ fun EmailLinkSentPage(navController: NavController) {
             Spacer(modifier = Modifier.height(screenHeight * 0.015f))
 
             Text(
-                "Click and verify your email",
+                "Click on the received link",
                 fontFamily = FontFamily.Serif,
                 color = newGreen,
                 fontSize = (screenWidth.value * 0.045).sp
@@ -85,15 +89,20 @@ fun EmailLinkSentPage(navController: NavController) {
                 Button(onClick = { checkVerificationStatus() }) {
                     Text(
                         "I've Verified, Check Now",
+                        color = Color.White,
+                        fontFamily = poppinsFontFamily,
                         fontSize = (screenWidth.value * 0.04).sp
                     )
                 }
             } else {
                 Button(onClick = {
                     navController.navigate(BeforeLoginScreensNavigationObject.LOGIN_SCREEN)
-                }) {
+                },
+                    colors = ButtonDefaults.buttonColors().copy(containerColor = gootooThemeBlue)) {
                     Text(
                         "Continue",
+                        color = Color.White,
+                        fontFamily = poppinsFontFamily,
                         fontSize = (screenWidth.value * 0.04).sp
                     )
                 }

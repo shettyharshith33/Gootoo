@@ -41,9 +41,13 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -54,17 +58,17 @@ import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.google.firebase.auth.FirebaseAuth
-import com.sharathkolpe.gootoo.R
 import com.sharathkolpe.beforeLoginScreens.showMsg
 import com.sharathkolpe.beforeLoginScreens.triggerVibration
 import com.sharathkolpe.firebaseAuth.AuthUser
-import com.sharathkolpe.utils.BeforeLoginScreensNavigationObject
-import com.sharathkolpe.utils.ResultState
-import com.sharathkolpe.gootoo.ui.theme.dodgerBlue
+import com.sharathkolpe.gootoo.R
+import com.sharathkolpe.gootoo.ui.theme.gootooThemeBlue
 import com.sharathkolpe.gootoo.ui.theme.myGreen
 import com.sharathkolpe.gootoo.ui.theme.netWorkRed
 import com.sharathkolpe.gootoo.ui.theme.poppinsFontFamily
 import com.sharathkolpe.gootoo.ui.theme.textColor
+import com.sharathkolpe.utils.BeforeLoginScreensNavigationObject
+import com.sharathkolpe.utils.ResultState
 import com.sharathkolpe.viewmodels.AuthViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -74,7 +78,6 @@ fun LoginScreen(
     navController: NavController,
     viewModel: AuthViewModel = hiltViewModel()
 ) {
-    val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.login_animation_2))
     var loginEmail by remember { mutableStateOf("") }
     var loginPassword by remember { mutableStateOf("") }
     val scope = rememberCoroutineScope()
@@ -92,7 +95,7 @@ fun LoginScreen(
 
     if (isDialog) {
         Dialog(onDismissRequest = {}) {
-            CircularProgressIndicator()
+            CircularProgressIndicator(color = gootooThemeBlue)
         }
     }
 
@@ -107,55 +110,50 @@ fun LoginScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top
         ) {
-            Spacer(modifier = Modifier.height(screenHeight * 0.08f))
-
+            Spacer(modifier = Modifier.height(screenHeight * 0.2f))
             Text(
-                "Vivekananda College of",
-                fontSize = (screenWidth.value * 0.05f).sp,
-                color = dodgerBlue,
-                fontFamily = poppinsFontFamily,
-                fontWeight = FontWeight.Bold
-            )
-            Text(
-                "Arts, Science and Commerce",
-                fontSize = (screenWidth.value * 0.05f).sp,
-                color = dodgerBlue,
-                fontFamily = poppinsFontFamily,
-                fontWeight = FontWeight.Bold
-            )
-            Text(
-                "(Autonomous)",
-                fontSize = (screenWidth.value * 0.04f).sp,
-                color = dodgerBlue,
-                fontFamily = poppinsFontFamily,
-                fontWeight = FontWeight.Bold
-            )
+                buildAnnotatedString {
+                    withStyle(
+                        style = SpanStyle(
+                            fontFamily = poppinsFontFamily,
+                            fontSize = 35.sp,
+                            color = Color.Black,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                    ) {
+                        append("Goo")
+                    }
 
-            Spacer(modifier = Modifier.height(screenHeight * 0.02f))
 
-            LottieAnimation(
-                composition = composition,
-                modifier = Modifier.size(screenWidth * 0.5f),
-                iterations = LottieConstants.IterateForever
+                    withStyle(
+                        style = SpanStyle(
+                            fontFamily = poppinsFontFamily,
+                            color = gootooThemeBlue,
+                            fontWeight = FontWeight.SemiBold,
+                            fontSize = 35.sp
+                        )
+                    ) {
+                        append("too")
+                    }
+                }, modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center
             )
+            Spacer(modifier = Modifier.height(screenHeight * 0.05f))
             Text(
                 "Login",
                 fontSize = 30.sp,
-                color = dodgerBlue,
+                color = gootooThemeBlue,
                 fontFamily = poppinsFontFamily,
                 fontWeight = FontWeight.Bold
             )
-            Spacer(modifier = Modifier.height(20.dp))
-
+            Spacer(modifier = Modifier.height(screenHeight * 0.03f))
             Text(
                 "Enter your e-mail",
                 fontSize = 15.sp,
-                color = dodgerBlue,
+                color = gootooThemeBlue,
                 fontFamily = poppinsFontFamily,
                 fontWeight = FontWeight.W500
             )
             Spacer(modifier = Modifier.height(10.dp))
-
             OutlinedTextField(
                 modifier = Modifier
                     .border(0.5.dp, textColor, shape = RoundedCornerShape(5.dp))
@@ -166,8 +164,8 @@ fun LoginScreen(
                 onValueChange = { loginEmail = it },
                 placeholder = { Text("E-mail") },
                 colors = TextFieldDefaults.colors(
-                    unfocusedIndicatorColor = if (emailError) Color.Red else dodgerBlue,
-                    focusedIndicatorColor = if (emailError) Color.Red else dodgerBlue
+                    unfocusedIndicatorColor = if (emailError) Color.Red else gootooThemeBlue,
+                    focusedIndicatorColor = if (emailError) Color.Red else gootooThemeBlue
                 )
             )
 
@@ -175,7 +173,7 @@ fun LoginScreen(
             Text(
                 "Enter your password",
                 fontSize = 15.sp,
-                color = dodgerBlue,
+                color = gootooThemeBlue,
                 fontFamily = poppinsFontFamily,
                 fontWeight = FontWeight.W500
             )
@@ -206,8 +204,8 @@ fun LoginScreen(
                 },
                 singleLine = true,
                 colors = TextFieldDefaults.colors(
-                    unfocusedIndicatorColor = if (passwordError) Color.Red else dodgerBlue,
-                    focusedIndicatorColor = if (passwordError) Color.Red else dodgerBlue
+                    unfocusedIndicatorColor = if (passwordError) Color.Red else gootooThemeBlue,
+                    focusedIndicatorColor = if (passwordError) Color.Red else gootooThemeBlue
                 )
             )
 
@@ -278,7 +276,7 @@ fun LoginScreen(
                     }
                 },
                 modifier = Modifier.width(150.dp),
-                colors = ButtonDefaults.buttonColors().copy(containerColor = dodgerBlue)
+                colors = ButtonDefaults.buttonColors().copy(containerColor = gootooThemeBlue)
             ) {
                 Text("Login", color = Color.White)
             }

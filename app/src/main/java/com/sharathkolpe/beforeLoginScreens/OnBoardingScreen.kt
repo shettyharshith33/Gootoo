@@ -43,6 +43,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalConfiguration
@@ -122,37 +123,7 @@ fun OnBoardingScreen(
 
     var confirmLogin by remember { mutableStateOf(false) }
 
-//    val launcher = rememberLauncherForActivityResult(
 
-//        contract = ActivityResultContracts.StartIntentSenderForResult()
-//    ) { result ->
-//        scope.launch {
-//            if (result.resultCode == Activity.RESULT_OK) {
-//                val credential = googleAuthUIClient.signInWithIntent(result.data!!)
-//                val idToken = credential?.googleIdToken
-//                if (idToken != null) {
-//                    viewModel.signInWithGoogle(idToken) { isSuccess ->
-//                        isSigningIn.value = false
-//                        if (isSuccess) {
-//                            Toast.makeText(context, "Login Successful", Toast.LENGTH_SHORT).show()
-//                            navController.navigate(BeforeLoginScreensNavigationObject.HOME_SCREEN) {
-//                                popUpTo("onboarding_screen") { inclusive = true }
-//                            }
-//                        } else {
-//                            Toast.makeText(context, "Login Failed", Toast.LENGTH_SHORT).show()
-//                        }
-//                    }
-//                } else {
-//                    isSigningIn.value = false
-//                    Toast.makeText(context, "Sign-in cancelled", Toast.LENGTH_SHORT).show()
-//                }
-//            } else {
-//                isSigningIn.value = false
-//                Toast.makeText(context, "Sign-in cancelled", Toast.LENGTH_SHORT).show()
-//            }
-//        }
-//    }
-//
     //Top Screen Text and Various Buttons for Login And Signup
     Column(
         modifier = Modifier
@@ -294,17 +265,36 @@ fun OnBoardingScreen(
                         }
                         .shimmer()
                 )
+                Spacer(modifier = Modifier.height(screenHeight * 0.03f))
+                Box(
+                    modifier = Modifier
+                        .clip(shape = RoundedCornerShape(10.dp))
+                        .background(gootooThemeBlue)
+                        .fillMaxWidth(.7f)
+                        .clickable { navController.navigate(BeforeLoginScreensNavigationObject.LOGIN_SCREEN) },
+                    contentAlignment = Alignment.Center
+                )
+                {
+                    Text(
+                        "Login with Email and Password",
+                        fontFamily = poppinsFontFamily,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White
+                    )
+                }
             }
         }
     }
-    if (loadingAnimation) {
+    if (loadingAnimation)
+    {
         LoadingAnimation()
     }
 }
 
 
 @Composable
-fun LoadingAnimation() {
+fun LoadingAnimation()
+{
 
     Box(
         modifier = Modifier
@@ -326,11 +316,13 @@ fun LoadingAnimation() {
                     iterations = LottieConstants.IterateForever,
                     modifier = Modifier.size(200.dp)
                 )
-                Text("Please Wait..Sending OTP",
+                Text(
+                    "Please Wait..Sending OTP",
                     modifier = Modifier.shimmer(),
                     color = gootooThemeBlue,
                     fontWeight = FontWeight.Bold,
-                    fontFamily = poppinsFontFamily)
+                    fontFamily = poppinsFontFamily
+                )
             } else {
                 // Show shimmer while loading
                 Box(
