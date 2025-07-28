@@ -284,27 +284,6 @@ fun LoginScreen(
     }
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 fun showColoredToast(context: Context, message: String, isSuccess: Boolean) {
     try {
         val toast = Toast.makeText(context, message, Toast.LENGTH_SHORT)
@@ -385,6 +364,3 @@ fun ShowForgotPasswordDialog(
         }
     )
 }
-
-
-

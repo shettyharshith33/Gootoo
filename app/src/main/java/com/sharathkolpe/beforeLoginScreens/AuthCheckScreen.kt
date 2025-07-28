@@ -1,4 +1,3 @@
-//Just Commited to check git connectivity
 
 package com.sharathkolpe.beforeLoginScreens
 

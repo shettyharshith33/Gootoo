@@ -4,7 +4,6 @@ import LoginScreen
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -13,17 +12,15 @@ import com.google.firebase.auth.FirebaseAuth
 import com.sharathkolpe.afterLoginScreens.DoctorDetailsScreen
 import com.sharathkolpe.afterLoginScreens.HomeScreen
 import com.sharathkolpe.beforeLoginScreens.AuthCheckScreen
-//import com.sharathkolpe.beforeLoginScreens.ConfirmLogin
 import com.sharathkolpe.beforeLoginScreens.EmailLinkSentPage
 import com.sharathkolpe.beforeLoginScreens.OnBoardingScreen
-import com.sharathkolpe.beforeLoginScreens.SignUpScreen
-import com.sharathkolpe.unused.OtpRequestPage
 import com.sharathkolpe.beforeLoginScreens.OtpVerificationPage
-import com.sharathkolpe.viewmodels.PatientHomeViewModel
+import com.sharathkolpe.beforeLoginScreens.SignUpScreen
 
 object BeforeLoginScreensNavigationObject {
     const val AUTH_CHECK = "authCheck"
     const val OTP_REQUEST_PAGE = "otpRequestPage"
+
     const val OTP_VERIFICATION_PAGE = "otpVerificationPage"
     const val ONBOARDING_SCREEN = "onBoardingScreen"
     const val SIGNUP_SCREEN = "signUpScreen"
@@ -43,12 +40,8 @@ fun BeforeLoginScreensNavigation(navController: NavController) {
 
     NavHost(
         navController = navController,
-        startDestination = BeforeLoginScreensNavigationObject.HOME_SCREEN
+        startDestination = BeforeLoginScreensNavigationObject.ONBOARDING_SCREEN
     ) {
-        composable(BeforeLoginScreensNavigationObject.OTP_REQUEST_PAGE) {
-            OtpRequestPage()
-        }
-
         composable("otp_verify/{verificationId}") { backStackEntry ->
             val verificationId = backStackEntry.arguments?.getString("verificationId")
             OtpVerificationPage(navController, verificationId)
@@ -78,21 +71,14 @@ fun BeforeLoginScreensNavigation(navController: NavController) {
             EmailLinkSentPage(navController)
         }
 
-//        composable("doctorDetails/{doctorId}") { backStackEntry ->
-//            val doctorId = backStackEntry.arguments?.getString("doctorId") ?: ""
-//            DoctorDetailsScreen(navController, doctorId)
-//        }
-
         composable("doctorDetails/{doctorId}") { backStackEntry ->
             val doctorId = backStackEntry.arguments?.getString("doctorId") ?: ""
-            val patientId = FirebaseAuth.getInstance().currentUser?.uid ?: "" // Or however you're managing auth
             DoctorDetailsScreen(
                 navController = navController,
                 doctorId = doctorId,
-                patientId = patientId
+                patientId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
             )
         }
-
 
     }
 }

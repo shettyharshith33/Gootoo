@@ -11,7 +11,7 @@
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
-        android:icon="@drawable/newapplogo"
+        android:icon="@drawable/gootoo_logo_patient_app"
         android:label="Gootoo"
         android:supportsRtl="true"
         android:theme="@style/Theme.Gootoo"

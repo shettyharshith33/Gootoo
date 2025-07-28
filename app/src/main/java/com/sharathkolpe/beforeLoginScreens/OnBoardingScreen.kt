@@ -74,7 +74,6 @@ import com.sharathkolpe.gootoo.R
 import com.sharathkolpe.gootoo.ui.theme.gootooThemeBlue
 import com.sharathkolpe.gootoo.ui.theme.poppinsFontFamily
 import com.sharathkolpe.utils.BeforeLoginScreensNavigationObject
-import com.sharathkolpe.utils.GoogleAuthUIClient
 import com.sharathkolpe.viewmodels.AuthViewModel
 import com.sharathkolpe.viewmodels.NetworkViewModel
 import com.valentinilk.shimmer.shimmer
@@ -95,34 +94,15 @@ fun OnBoardingScreen(
     val screenWidth = configuration.screenWidthDp.dp
     val screenHeight = configuration.screenHeightDp.dp
     val context = LocalContext.current
-    val haptic = LocalHapticFeedback.current
 
     val activity = context as ComponentActivity
     var phoneNumber by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(false) }
-
     var loadingAnimation by remember { mutableStateOf(false) }
-
-    val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.splash_screen))
-    var mobileNum by remember { mutableStateOf("") }
-
-    val scope = rememberCoroutineScope()
-
-    //Mutable variable to remember Sign-in Activity
-    val isSigningIn = remember { mutableStateOf(false) }
-
-
-    val viewModel: AuthViewModel = hiltViewModel()
-    val oneTapClient = remember { Identity.getSignInClient(context) }
-    val googleAuthUIClient = remember { GoogleAuthUIClient(context, oneTapClient) }
-
     val firebaseFirebaseAppCheck = FirebaseAppCheck.getInstance()
     firebaseFirebaseAppCheck.installAppCheckProviderFactory(
         PlayIntegrityAppCheckProviderFactory.getInstance()
     )
-
-    var confirmLogin by remember { mutableStateOf(false) }
-
 
     //Top Screen Text and Various Buttons for Login And Signup
     Column(
@@ -131,7 +111,8 @@ fun OnBoardingScreen(
             .padding(horizontal = screenWidth * 0.05f),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top
-    ) {
+    )
+    {
         // App Name
         Spacer(modifier = Modifier.height(screenHeight * 0.2f))
         Text(
@@ -143,10 +124,10 @@ fun OnBoardingScreen(
                         color = Color.Black,
                         fontWeight = FontWeight.SemiBold
                     )
-                ) {
+                )
+                {
                     append("Goo")
                 }
-
 
                 withStyle(
                     style = SpanStyle(
@@ -155,10 +136,12 @@ fun OnBoardingScreen(
                         fontWeight = FontWeight.SemiBold,
                         fontSize = 35.sp
                     )
-                ) {
+                )
+                {
                     append("too")
                 }
-            }, modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center
+            },
+            modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center
         )
 
         val lottieUrl =
@@ -181,11 +164,13 @@ fun OnBoardingScreen(
                     .background(Color.LightGray, shape = RoundedCornerShape(16.dp))
             )
         }
-        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter)
+        {
             Column(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally
-            ) {
+            )
+            {
                 OutlinedTextField(
                     leadingIcon = {
                         Icon(
@@ -369,43 +354,3 @@ fun sendVerificationCode(
 
     PhoneAuthProvider.verifyPhoneNumber(options)
 }
-
-
-//@Composable
-//fun OnBoardingScreen(navController: NavController) {
-//    val context = LocalContext.current
-//    val activity = context as ComponentActivity
-//    var phoneNumber by remember { mutableStateOf("") }
-//    var isLoading by remember { mutableStateOf(false) }
-//
-//    Column(
-//        modifier = Modifier
-//            .fillMaxSize()
-//            .padding(24.dp),
-//        verticalArrangement = Arrangement.Center
-//    ) {
-//        OutlinedTextField(
-//            value = phoneNumber,
-//            onValueChange = { phoneNumber = it },
-//            label = { Text("Enter Phone Number") },
-//            modifier = Modifier.fillMaxWidth()
-//        )
-//
-//        Spacer(modifier = Modifier.height(16.dp))
-//
-//        Button(
-//            onClick = {
-//
-//            },
-//            modifier = Modifier.fillMaxWidth(),
-//            enabled = !isLoading
-//        ) {
-//            Text(if (isLoading) "Sending..." else "Send OTP")
-//        }
-//    }
-//}
-//
-
-//
-//
-//

@@ -1,5 +1,6 @@
 package com.sharathkolpe.afterLoginScreens
 
+import SetStatusBarColor
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -19,10 +20,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.sharathkolpe.gootoo.ui.theme.gootooThemeBlue
 import com.sharathkolpe.viewmodels.PatientHomeViewModel
-
-
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -32,9 +31,11 @@ fun HomeScreen(navController: NavController) {
     val isLoading by viewModel.isLoading.collectAsState()
     var searchQuery by remember { mutableStateOf("") }
     var selectedTab by remember { mutableStateOf(0) }
+    SetStatusBarColor(gootooThemeBlue, useDarkIcons = false)
 
     // Fetch doctors when HomeScreen loads
-    LaunchedEffect(Unit) {
+    LaunchedEffect(Unit)
+    {
         viewModel.fetchDoctorsFromFirestore()
     }
 
@@ -120,6 +121,7 @@ fun HomeScreen(navController: NavController) {
                                 doctor = doctor
                             )
                             {
+                                println("👀 Clicked doctor ID: ${doctor.id}")
                                 navController.navigate("doctorDetails/${doctor.id}")
                             }
                         }

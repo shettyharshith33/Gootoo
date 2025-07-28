@@ -31,15 +31,17 @@ import com.sharathkolpe.gootoo.ui.theme.poppinsFontFamily
 import com.sharathkolpe.gootoo.ui.theme.spotifyGreen
 
 @Composable
-fun DoctorCard(doctor: Doctor,
-               onClick: () -> Unit ) {
+fun DoctorCard(
+    doctor: Doctor,
+    onClick: () -> Unit
+) {
     Card(
         shape = RoundedCornerShape(12.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
         modifier = Modifier
             .fillMaxWidth()
             .clickable {
-            onClick()
+                onClick()
             }
     ) {
         Row(
@@ -67,36 +69,49 @@ fun DoctorCard(doctor: Doctor,
                     fontFamily = poppinsFontFamily
                 )
                 Text("")
-                Text("Specialization: ${doctor.specialization}",
+                Text(
+                    "Specialization: ${doctor.specialization}",
                     color = Color.DarkGray,
                     fontFamily = poppinsFontFamily,
                     fontSize = 13.sp,
-                    fontWeight = FontWeight.SemiBold)
-                Text("Experience: ${doctor.experience} Year(s)",
+                    fontWeight = FontWeight.SemiBold
+                )
+                Text(
+                    "Experience: ${doctor.experience} Year(s)",
                     fontSize = 13.sp,
                     color = Color.DarkGray,
                     fontFamily = poppinsFontFamily,
-                    fontWeight = FontWeight.SemiBold)
-                Text("Qualification: ${doctor.qualification} Year(s)",
+                    fontWeight = FontWeight.SemiBold
+                )
+                Text(
+                    "Qualification: ${doctor.qualification} Year(s)",
                     fontSize = 13.sp,
                     color = Color.DarkGray,
                     fontFamily = poppinsFontFamily,
-                    fontWeight = FontWeight.SemiBold)
-                Text("Clinic: ${doctor.clinicName}",
+                    fontWeight = FontWeight.SemiBold
+                )
+                Text(
+                    "Clinic: ${doctor.clinicName}",
                     fontSize = 13.sp,
                     color = Color.DarkGray,
                     fontFamily = poppinsFontFamily,
-                    fontWeight = FontWeight.SemiBold)
+                    fontWeight = FontWeight.SemiBold
+                )
                 Text("")
-                Box(modifier = Modifier.fillMaxWidth()
-                    .clip(shape = RoundedCornerShape(8.dp))
-                    .background(lightGreen),
-                    contentAlignment = Alignment.Center)
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(shape = RoundedCornerShape(8.dp))
+                        .background(lightGreen),
+                    contentAlignment = Alignment.Center
+                )
                 {
-                    Text("Book Appointment",
+                    Text(
+                        "Book Appointment",
                         fontFamily = poppinsFontFamily,
                         color = Color.Black,
-                        fontWeight = FontWeight.SemiBold)
+                        fontWeight = FontWeight.SemiBold
+                    )
                 }
             }
         }

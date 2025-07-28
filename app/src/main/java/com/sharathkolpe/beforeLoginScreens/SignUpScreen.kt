@@ -97,13 +97,9 @@ fun SignUpScreen(
         verticalArrangement = Arrangement.Top
     ) {
         //Spacer(modifier = Modifier.height(screenHeight * 0.08f))
-
-        //NetworkStatusBanner(isConnected = true)
-
         //Spacer(modifier = Modifier.height(10.dp))
 
         //College Name Header Text
-
         Spacer(modifier = Modifier.height(screenHeight * 0.2f))
         Text(
             buildAnnotatedString {
@@ -114,10 +110,10 @@ fun SignUpScreen(
                         color = Color.Black,
                         fontWeight = FontWeight.SemiBold
                     )
-                ) {
+                )
+                {
                     append("Goo")
                 }
-
 
                 withStyle(
                     style = SpanStyle(
@@ -195,18 +191,19 @@ fun SignUpScreen(
             maxLines = 1,
             placeholder = { Text("Password") },
             visualTransformation =
-            if (passwordVisible)
-                VisualTransformation.None
-            else {
-                PasswordVisualTransformation()
-            },
+                if (passwordVisible)
+                    VisualTransformation.None
+                else {
+                    PasswordVisualTransformation()
+                },
             trailingIcon = {
                 val icon = if (passwordVisible)
                     R.drawable.visibilty            //Password Visibility Button / Icon   -   Eye Open
                 else
                     R.drawable.visibilty_off       //Password Visibility Button / Icon   -   Eye Closed
 
-                Image(painterResource(icon), contentDescription = "",
+                Image(
+                    painterResource(icon), contentDescription = "",
                     modifier = Modifier.clickable { passwordVisible = !passwordVisible })
             },
             colors = TextFieldDefaults.colors(
@@ -248,7 +245,9 @@ fun SignUpScreen(
 
                             is ResultState.Failure -> {
                                 isDialog = false
-                                context.showMsg(result.msg?.message ?: "An error occurred") //Error Sending Email
+                                context.showMsg(
+                                    result.msg?.message ?: "An error occurred"
+                                ) //Error Sending Email
                             }
 
                             is ResultState.Loading -> {
@@ -272,99 +271,12 @@ fun SignUpScreen(
     }
 }
 
-
-// Network Status Banner To Show User Is Online / Offline
-//@Composable
-//fun NetworkStatusBanner(isConnected: Boolean) {
-//    var showBackOnlineMessage by remember { mutableStateOf(false) }
-//    var previousState by remember { mutableStateOf(isConnected) }
-//
-//    // When network is back, show message for 3 seconds
-//    LaunchedEffect(isConnected) {
-//        if (!previousState && isConnected) {
-//            // If previously offline and now online, show "You are back online"
-//            showBackOnlineMessage = true
-//            delay(2000) // Show for 3 seconds
-//            showBackOnlineMessage = false
-//        }
-//        previousState = isConnected
-//    }
-//
-//    Column {
-//        // Show "You are offline" message when disconnected
-//        AnimatedVisibility(
-//            visible = !isConnected,
-//            enter = fadeIn(),
-//            exit = fadeOut()
-//        ) {
-//            Box(
-//                modifier = Modifier
-//                    .clip(shape = RoundedCornerShape(20.dp))
-//                    .width(250.dp)
-//                    .background(netWorkRed)
-//                    .padding(12.dp),
-//                contentAlignment = Alignment.Center
-//            ) {
-//                Row {
-//                    Icon(
-//                        painter = painterResource(R.drawable.offline),
-//                        contentDescription = "",
-//                        tint = Color.Unspecified
-//                    )
-//                    Spacer(modifier = Modifier.width(10.dp))
-//                    Text(
-//                        text = "You are offline",
-//                        color = Color.White,
-//                        fontSize = 16.sp,
-//                        fontWeight = FontWeight.Bold
-//                    )
-//                }
-//            }
-//        }
-//
-//        // Show "You are back online" message for a few seconds
-//        AnimatedVisibility(
-//            visible = showBackOnlineMessage,
-//            enter = fadeIn(),
-//            exit = fadeOut()
-//        ) {
-//            Box(
-//                modifier = Modifier
-//                    .clip(shape = RoundedCornerShape(20.dp))
-//                    .width(250.dp)
-//                    .background(myGreen)
-//                    .padding(12.dp),
-//                contentAlignment = Alignment.Center
-//            ) {
-//                Row {
-//                    Icon(
-//                        painter = painterResource(R.drawable.online),
-//                        contentDescription = "",
-//                        tint = Color.Unspecified
-//                    )
-//                    Spacer(modifier = Modifier.width(10.dp))
-//                    Text(
-//                        text = "You are back online",
-//                        color = Color.Black,
-//                        fontSize = 16.sp,
-//                        fontWeight = FontWeight.Bold
-//                    )
-//                }
-//            }
-//        }
-//    }
-//}
-
-
 //Function for Triggering Vibration / Haptic Feedback
 fun triggerVibration(context: Context) {
     val vibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-    {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
         vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE))
-    }
-    else
-    {
+    } else {
         vibrator.vibrate(200)
     }
 }

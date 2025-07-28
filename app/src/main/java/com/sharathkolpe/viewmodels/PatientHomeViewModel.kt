@@ -24,7 +24,8 @@ class PatientHomeViewModel : ViewModel() {
             .get()
             .addOnSuccessListener { result ->
                 val doctors = result.documents.mapNotNull { doc ->
-                    doc.toObject(Doctor::class.java)
+                    val doctor = doc.toObject(Doctor::class.java)
+                    doctor?.copy(id = doc.id) // ✅ Important line
                 }
                 _doctorList.value = doctors
                 _isLoading.value = false
