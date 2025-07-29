@@ -84,7 +84,7 @@ fun DoctorCard(
                     fontWeight = FontWeight.SemiBold
                 )
                 Text(
-                    "Qualification: ${doctor.qualification} Year(s)",
+                    "Qualification: ${doctor.qualification}",
                     fontSize = 13.sp,
                     color = Color.DarkGray,
                     fontFamily = poppinsFontFamily,
