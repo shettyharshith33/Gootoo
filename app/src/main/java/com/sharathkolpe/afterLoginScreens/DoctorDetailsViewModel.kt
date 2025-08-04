@@ -1,288 +1,23 @@
-//package com.sharathkolpe.viewmodels
-//
-//import androidx.lifecycle.ViewModel
-//import androidx.lifecycle.viewModelScope
-//import com.google.firebase.firestore.FirebaseFirestore
-//import com.google.firebase.firestore.SetOptions
-//import kotlinx.coroutines.flow.MutableStateFlow
-//import kotlinx.coroutines.flow.StateFlow
-//import kotlinx.coroutines.launch
-//
-//class DoctorDetailsViewModel : ViewModel() {
-//
-//    private val firestore = FirebaseFirestore.getInstance()
-//
-//    private val _doctorName = MutableStateFlow("")
-//    val doctorName: StateFlow<String> = _doctorName
-//
-//    private val _specialization = MutableStateFlow("")
-//    val specialization: StateFlow<String> = _specialization
-//
-//
-//    private val _experience = MutableStateFlow("")
-//    val experience: StateFlow<String> = _experience
-//
-//    private val _qualification = MutableStateFlow("")
-//    val qualification: StateFlow<String> = _qualification
-//
-//    private val _clinicName = MutableStateFlow("")
-//    val clinicName: StateFlow<String> = _clinicName
-//
-//    private val _profileImageUrl = MutableStateFlow("")
-//    val profileImageUrl: StateFlow<String> = _profileImageUrl
-//
-//
-//    private val _place = MutableStateFlow("")
-//    val place: StateFlow<String> = _place
-//
-//
-//    private val _slots = MutableStateFlow<Map<String, Boolean>>(emptyMap())
-//    val slots: StateFlow<Map<String, Boolean>> = _slots
-//
-//    private val _isBooking = MutableStateFlow(false)
-//    val isBooking: StateFlow<Boolean> = _isBooking
-//
-//    fun loadDoctorDetails(doctorId: String) {
-//        viewModelScope.launch {
-//            val docRef = firestore.collection("doctors").document(doctorId)
-//            docRef.get().addOnSuccessListener { snapshot ->
-//                _doctorName.value = snapshot.getString("name") ?: "Unknown"
-//                _specialization.value = snapshot.getString("specialization") ?: ""
-//                _experience.value = snapshot.getString("experience") ?: ""
-//                _qualification.value = snapshot.getString("qualification") ?: ""
-//                _clinicName.value = snapshot.getString("clinicName") ?: ""
-//                _profileImageUrl.value = snapshot.getString("profileImageUrl") ?: ""
-//                _place.value = snapshot.getString("place") ?: ""
-//            }
-//
-//            val slotsRef = firestore.collection("doctors")
-//                .document(doctorId)
-//                .collection("slots")
-//
-//            slotsRef.addSnapshotListener { snapshot, _ ->
-//                val newSlots = mutableMapOf<String, Boolean>()
-//                snapshot?.documents?.forEach {
-//                    val slotName = it.id
-//                    val booked = it.getBoolean("booked") ?: false
-//                    newSlots[slotName] = booked
-//                }
-//                _slots.value = newSlots
-//            }
-//        }
-//    }
-//
-//    fun bookSlot(
-//        doctorId: String,
-//        slot: String,
-//        patientId: String,
-//        onSuccess: () -> Unit,
-//        onFailure: (String) -> Unit
-//    ) {
-//        _isBooking.value = true
-//        val slotRef = firestore.collection("doctors")
-//            .document(doctorId)
-//            .collection("slots")
-//            .document(slot)
-//
-//        firestore.runTransaction { transaction ->
-//            val snapshot = transaction.get(slotRef)
-//            val isBooked = snapshot.getBoolean("booked") ?: false
-//            if (isBooked) {
-//                throw Exception("Slot already booked.")
-//            }
-//
-//            // Mark slot as booked
-//            transaction.set(
-//                slotRef,
-//                mapOf("booked" to true, "bookedBy" to patientId),
-//                SetOptions.merge()
-//            )
-//
-//            // Optional: add to a global 'appointments' collection
-//            val globalBooking = mapOf(
-//                "doctorId" to doctorId,
-//                "slot" to slot,
-//                "patientId" to patientId,
-//                "timestamp" to System.currentTimeMillis()
-//            )
-//            firestore.collection("appointments").add(globalBooking)
-//
-//        }.addOnSuccessListener {
-//            _isBooking.value = false
-//            onSuccess()
-//        }.addOnFailureListener {
-//            _isBooking.value = false
-//            onFailure(it.message ?: "Booking failed")
-//        }
-//    }
-//}
-
-
-
-//package com.sharathkolpe.viewmodels
-//
-//import androidx.lifecycle.ViewModel
-//import androidx.lifecycle.viewModelScope
-//import com.google.firebase.Timestamp
-//import com.google.firebase.firestore.FirebaseFirestore
-//import kotlinx.coroutines.flow.MutableStateFlow
-//import kotlinx.coroutines.flow.StateFlow
-//import kotlinx.coroutines.launch
-//import java.text.SimpleDateFormat
-//import java.util.*
-//
-//class DoctorDetailsViewModel : ViewModel() {
-//
-//    private val db = FirebaseFirestore.getInstance()
-//
-//    private val _doctorName = MutableStateFlow("")
-//    val doctorName: StateFlow<String> = _doctorName
-//
-//    private val _specialization = MutableStateFlow("")
-//    val specialization: StateFlow<String> = _specialization
-//
-//    private val _experience = MutableStateFlow("")
-//    val experience: StateFlow<String> = _experience
-//
-//    private val _qualification = MutableStateFlow("")
-//    val qualification: StateFlow<String> = _qualification
-//
-//    private val _clinicName = MutableStateFlow("")
-//    val clinicName: StateFlow<String> = _clinicName
-//
-//    private val _place = MutableStateFlow("")
-//    val place: StateFlow<String> = _place
-//
-//    private val _profileImageUrl = MutableStateFlow("")
-//    val profileImageUrl: StateFlow<String> = _profileImageUrl
-//
-//    private val _availability = MutableStateFlow<Map<String, Pair<String, String>>>(emptyMap())
-//    val availability: StateFlow<Map<String, Pair<String, String>>> = _availability
-//
-//    private val _currentDayBookings = MutableStateFlow<Map<String, Int>>(emptyMap())
-//    val currentDayBookings: StateFlow<Map<String, Int>> = _currentDayBookings
-
-
-
-
-//    private fun getCurrentDayKey(): String {
-//        val calendar = Calendar.getInstance()
-//        return calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.getDefault())!!
-//            .lowercase(Locale.getDefault())
-//    }
-
-//    private fun getCurrentDayKey(): String {
-//        val sdf = SimpleDateFormat("EEEE", Locale.getDefault())
-//        return sdf.format(Date()) // e.g., "Monday"
-//    }
-//
-//
-//    private fun getCurrentDateId(): String {
-//        val formatter = SimpleDateFormat("yyyyMMdd", Locale.getDefault())
-//        return formatter.format(Date())
-//    }
-//
-//    fun loadDoctorDetails(doctorId: String) {
-//        viewModelScope.launch {
-//            val docRef = db.collection("doctors").document(doctorId)
-//            docRef.get().addOnSuccessListener { document ->
-//                _doctorName.value = document.getString("name") ?: ""
-//                _specialization.value = document.getString("specialization") ?: ""
-//                _experience.value = document.getString("experience") ?: ""
-//                _qualification.value = document.getString("qualification") ?: ""
-//                _clinicName.value = document.getString("clinicName") ?: ""
-//                _place.value = document.getString("place") ?: ""
-//                _profileImageUrl.value = document.getString("profileImageUrl") ?: ""
-//
-//
-//                val today = getCurrentDayKey()
-//                docRef.collection("availability").document(today).get().addOnSuccessListener {
-//                    val morning = it.getString("morning") ?: ""
-//                    val afternoon = it.getString("afternoon") ?: ""
-//
-//                    val availabilityMap = mutableMapOf<String, Pair<String, String>>()
-//                    if (morning.contains("-")) {
-//                        val (start, end) = morning.split("-")
-//                        availabilityMap["morning"] = Pair(start, end)
-//                    }
-//                    if (afternoon.contains("-")) {
-//                        val (start, end) = afternoon.split("-")
-//                        availabilityMap["afternoon"] = Pair(start, end)
-//                    }
-//                    _availability.value = availabilityMap
-//                }
-//
-//                loadBookingsCount(doctorId)
-//            }
-//        }
-//    }
-//
-//    private fun loadBookingsCount(doctorId: String) {
-//        val todayId = getCurrentDateId()
-//        val bookingsRef = db.collection("bookings").document("${doctorId}_$todayId").collection("tokens")
-//        bookingsRef.get().addOnSuccessListener { snapshot ->
-//            val countMap = mutableMapOf<String, Int>()
-//            for (doc in snapshot) {
-//                val slot = doc.getString("slot") ?: continue
-//                countMap[slot] = countMap.getOrDefault(slot, 0) + 1
-//            }
-//            _currentDayBookings.value = countMap
-//        }
-//    }
-//
-//    fun bookSlot(
-//        doctorId: String,
-//        patientId: String,
-//        slot: String,
-//        onSuccess: (Int, String) -> Unit,
-//        onFailure: (String) -> Unit
-//    ) {
-//        val todayId = getCurrentDateId()
-//        val timestamp = Timestamp.now()
-//        val bookingsRef = db.collection("bookings")
-//            .document("${doctorId}_$todayId")
-//            .collection("tokens")
-//
-//        bookingsRef.get().addOnSuccessListener { snapshot ->
-//            val tokenNumber = snapshot.filter { it.getString("slot") == slot }.size + 1
-//            val tokenData = mapOf(
-//                "doctorId" to doctorId,
-//                "patientId" to patientId,
-//                "slot" to slot,
-//                "tokenNumber" to tokenNumber,
-//                "timestamp" to timestamp
-//            )
-//
-//            bookingsRef.add(tokenData).addOnSuccessListener {
-//                val sdf = SimpleDateFormat("dd MMM yyyy, hh:mm a", Locale.getDefault())
-//                onSuccess(tokenNumber, sdf.format(Date()))
-//            }.addOnFailureListener {
-//                onFailure("Failed to save booking: ${it.message}")
-//            }
-//        }.addOnFailureListener {
-//            onFailure("Error loading bookings: ${it.message}")
-//        }
-//    }
-//}
-
-
-
-
-
-
 package com.sharathkolpe.viewmodels
 
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.concurrent.fixedRateTimer
+import kotlin.text.get
+import kotlin.time.Duration.Companion.seconds
 
 class DoctorDetailsViewModel : ViewModel() {
 
     private val db = FirebaseFirestore.getInstance()
+    val closedSessions = mutableStateMapOf<String, Boolean>()
 
     private val _doctorName = MutableStateFlow("")
     val doctorName: StateFlow<String> = _doctorName
@@ -311,9 +46,13 @@ class DoctorDetailsViewModel : ViewModel() {
     private val _currentDayBookings = MutableStateFlow<Map<String, Int>>(emptyMap())
     val currentDayBookings: StateFlow<Map<String, Int>> = _currentDayBookings
 
+    private val _bookingTimers = mutableStateMapOf<String, String>()
+    val bookingTimers: Map<String, String> = _bookingTimers
+
     private fun getCurrentDayKey(): String {
         val calendar = Calendar.getInstance()
-        val days = listOf("Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday")
+        val days =
+            listOf("Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday")
         return days[calendar.get(Calendar.DAY_OF_WEEK) - 1]
     }
 
@@ -335,7 +74,6 @@ class DoctorDetailsViewModel : ViewModel() {
                 _place.value = document.getString("place") ?: ""
                 _profileImageUrl.value = document.getString("profileImageUrl") ?: ""
 
-                // ✅ Fetch today's availability from inline map
                 val today = getCurrentDayKey()
                 val availabilityMap = mutableMapOf<String, Pair<String, String>>()
 
@@ -362,22 +100,45 @@ class DoctorDetailsViewModel : ViewModel() {
                 _availability.value = availabilityMap
 
                 loadBookingsCount(doctorId)
+                startBookingTimers()
             }
         }
     }
 
     private fun loadBookingsCount(doctorId: String) {
         val todayId = getCurrentDateId()
-        val bookingsRef = db.collection("bookings")
-            .document("${doctorId}_$todayId")
+
+        val bookingsRef = db.collection("appointments")
+            .document(doctorId)
             .collection("tokens")
 
         bookingsRef.get().addOnSuccessListener { snapshot ->
             val countMap = mutableMapOf<String, Int>()
+
+            val today = Calendar.getInstance().apply {
+                set(Calendar.HOUR_OF_DAY, 0)
+                set(Calendar.MINUTE, 0)
+                set(Calendar.SECOND, 0)
+                set(Calendar.MILLISECOND, 0)
+            }
+
+            val tomorrow = Calendar.getInstance().apply {
+                add(Calendar.DATE, 1)
+                set(Calendar.HOUR_OF_DAY, 0)
+                set(Calendar.MINUTE, 0)
+                set(Calendar.SECOND, 0)
+                set(Calendar.MILLISECOND, 0)
+            }
+
             for (doc in snapshot) {
                 val slot = doc.getString("slot") ?: continue
-                countMap[slot] = countMap.getOrDefault(slot, 0) + 1
+                val timestamp = doc.getTimestamp("timestamp")?.toDate() ?: continue
+
+                if (timestamp >= today.time && timestamp < tomorrow.time) {
+                    countMap[slot] = countMap.getOrDefault(slot, 0) + 1
+                }
             }
+
             _currentDayBookings.value = countMap
         }
     }
@@ -389,15 +150,35 @@ class DoctorDetailsViewModel : ViewModel() {
         onSuccess: (tokenNumber: Int, formattedTime: String) -> Unit,
         onFailure: (errorMessage: String) -> Unit
     ) {
-        val todayId = getCurrentDateId()
         val timestamp = Timestamp.now()
 
-        val bookingsRef = db.collection("bookings")
-            .document("${doctorId}_$todayId")
+        val bookingsRef = db.collection("appointments")
+            .document(doctorId)
             .collection("tokens")
 
         bookingsRef.get().addOnSuccessListener { snapshot ->
-            val tokenNumber = snapshot.filter { it.getString("slot") == slot }.size + 1
+            val today = Calendar.getInstance().apply {
+                set(Calendar.HOUR_OF_DAY, 0)
+                set(Calendar.MINUTE, 0)
+                set(Calendar.SECOND, 0)
+                set(Calendar.MILLISECOND, 0)
+            }
+            val tomorrow = Calendar.getInstance().apply {
+                add(Calendar.DATE, 1)
+                set(Calendar.HOUR_OF_DAY, 0)
+                set(Calendar.MINUTE, 0)
+                set(Calendar.SECOND, 0)
+                set(Calendar.MILLISECOND, 0)
+            }
+
+            val todaySlotTokens = snapshot.filter {
+                val slotMatch = it.getString("slot") == slot
+                val timestamp = it.getTimestamp("timestamp")?.toDate()
+                slotMatch && timestamp != null && timestamp >= today.time && timestamp < tomorrow.time
+            }
+
+            val tokenNumber = todaySlotTokens.size + 1
+
 
             val tokenData = mapOf(
                 "doctorId" to doctorId,
@@ -418,5 +199,91 @@ class DoctorDetailsViewModel : ViewModel() {
         }.addOnFailureListener {
             onFailure("Error loading bookings: ${it.message}")
         }
+    }
+
+    fun isSlotBookable(slot: String): Boolean {
+        val sessionTime = availability.value[slot] ?: return false
+        val formatter = SimpleDateFormat("hh:mm a", Locale.getDefault())
+
+        val now = Calendar.getInstance()
+
+        val startTime = Calendar.getInstance().apply {
+            time = formatter.parse(sessionTime.first) ?: return false
+            set(Calendar.YEAR, now.get(Calendar.YEAR))
+            set(Calendar.MONTH, now.get(Calendar.MONTH))
+            set(Calendar.DAY_OF_MONTH, now.get(Calendar.DAY_OF_MONTH))
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
+        }
+
+        val endTime = Calendar.getInstance().apply {
+            time = formatter.parse(sessionTime.second) ?: return false
+            set(Calendar.YEAR, now.get(Calendar.YEAR))
+            set(Calendar.MONTH, now.get(Calendar.MONTH))
+            set(Calendar.DAY_OF_MONTH, now.get(Calendar.DAY_OF_MONTH))
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
+        }
+
+        val bookingOpenTime = (startTime.clone() as Calendar).apply {
+            add(Calendar.HOUR_OF_DAY, -1)
+        }
+
+        return now.time.after(bookingOpenTime.time) && now.time.before(endTime.time)
+    }
+
+    private fun startBookingTimers() {
+        val formatter = SimpleDateFormat("hh:mm a", Locale.getDefault())
+
+        availability.value.forEach { (slot, sessionTime) ->
+            val now = Calendar.getInstance()
+            val openTime = Calendar.getInstance().apply {
+                time = formatter.parse(sessionTime.first) ?: return@forEach
+                add(Calendar.HOUR_OF_DAY, -1)
+                set(Calendar.YEAR, now.get(Calendar.YEAR))
+                set(Calendar.MONTH, now.get(Calendar.MONTH))
+                set(Calendar.DAY_OF_MONTH, now.get(Calendar.DAY_OF_MONTH))
+                set(Calendar.SECOND, 0)
+                set(Calendar.MILLISECOND, 0)
+            }
+
+            // If already open, skip timer
+            if (now.time >= openTime.time) {
+                _bookingTimers[slot] = ""
+                return@forEach
+            }
+
+            // Start timer to count down
+            fixedRateTimer(
+                name = "booking_timer_$slot",
+                initialDelay = 0,
+                period = 1000
+            ) {
+                val diffMillis = openTime.timeInMillis - System.currentTimeMillis()
+                if (diffMillis <= 0) {
+                    _bookingTimers[slot] = ""
+                    cancel()
+                } else {
+                    val hours = diffMillis / (1000 * 60 * 60)
+                    val minutes = (diffMillis / (1000 * 60)) % 60
+                    val seconds = (diffMillis / 1000) % 60
+
+                    _bookingTimers[slot] = "Booking opens in ${hours}h ${minutes}m ${seconds}s"
+                }
+            }
+        }
+    }
+
+
+    fun startAutoRefresh(doctorId: String) {
+        viewModelScope.launch {
+            while (true) {
+                loadBookingsCount(doctorId)
+                kotlinx.coroutines.delay(5000) // Refresh every 5 seconds
+            }
+        }
+        loadBookingsCount(doctorId)
+        startBookingTimers()
+        startAutoRefresh(doctorId)
     }
 }

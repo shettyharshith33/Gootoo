@@ -65,4 +65,5 @@ class AuthActivity : ComponentActivity() {
             BeforeLoginScreensNavigation(navController)
         }
     }
+
 }

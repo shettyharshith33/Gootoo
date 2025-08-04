@@ -13,7 +13,9 @@ import androidx.navigation.navArgument
 import com.google.firebase.auth.FirebaseAuth
 import com.sharathkolpe.afterLoginScreens.ConfirmationImageScreenVisible
 import com.sharathkolpe.afterLoginScreens.DoctorDetailsScreen
+
 import com.sharathkolpe.afterLoginScreens.HomeScreen
+import com.sharathkolpe.afterLoginScreens.MyBookingsScreen
 import com.sharathkolpe.beforeLoginScreens.AuthCheckScreen
 import com.sharathkolpe.beforeLoginScreens.EmailLinkSentPage
 import com.sharathkolpe.beforeLoginScreens.OnBoardingScreen
@@ -32,6 +34,8 @@ object BeforeLoginScreensNavigationObject {
     const val EMAIL_LINK_SENT_PAGE = "emailLinkSentPage"
 
     const val DOCTOR_DETAILS_SCREEN = "doctorDetailsScreen"
+
+    const val MY_BOOKING_SCREEN = "myBookingScreen"
 }
 
 
@@ -43,7 +47,7 @@ fun BeforeLoginScreensNavigation(navController: NavController) {
 
     NavHost(
         navController = navController,
-        startDestination = BeforeLoginScreensNavigationObject.AUTH_CHECK
+        startDestination = BeforeLoginScreensNavigationObject.ONBOARDING_SCREEN
     ) {
         composable("otp_verify/{verificationId}") { backStackEntry ->
             val verificationId = backStackEntry.arguments?.getString("verificationId")
@@ -83,31 +87,10 @@ fun BeforeLoginScreensNavigation(navController: NavController) {
             )
         }
 
-//        composable(
-//            route = "confirmation_screen/{tokenNumber}/{doctorName}/{time}/{session}",
-//            arguments = listOf(
-//                navArgument("tokenNumber") { type = NavType.IntType },
-//                navArgument("doctorName") { type = NavType.StringType },
-//                navArgument("time") { type = NavType.StringType },
-//                navArgument("session") { type = NavType.StringType }
-//            )
-//        ) { backStackEntry ->
-//            val tokenNumber = backStackEntry.arguments?.getInt("tokenNumber") ?: 0
-//            val doctorName = backStackEntry.arguments?.getString("doctorName") ?: ""
-//            val time = backStackEntry.arguments?.getString("time") ?: ""
-//            val session = backStackEntry.arguments?.getString("session") ?: ""
-//
-//            ConfirmationImageScreen(
-//                tokenNumber = tokenNumber,
-//                doctorName = doctorName,
-//                time = time,
-//                session = session,
-//                onSaved = {
-//                    // Optional: navigate back to home or show snackbar
-//                    navController.popBackStack("home", inclusive = false)
-//                }
-//            )
-//        }
+
+        composable(route = BeforeLoginScreensNavigationObject.MY_BOOKING_SCREEN) {
+            MyBookingsScreen()
+        }
 
 
         composable(
@@ -117,8 +100,7 @@ fun BeforeLoginScreensNavigation(navController: NavController) {
                 navArgument("doctorName") { type = NavType.StringType },
                 navArgument("time") { type = NavType.StringType },
                 navArgument("session") { type = NavType.StringType },
-                navArgument("bookingDateTime") { type = NavType.StringType }
-            )
+                navArgument("bookingDateTime") { type = NavType.StringType })
         ) { backStackEntry ->
             val tokenNumber = backStackEntry.arguments?.getInt("tokenNumber") ?: 0
             val doctorName = backStackEntry.arguments?.getString("doctorName") ?: ""
@@ -132,13 +114,7 @@ fun BeforeLoginScreensNavigation(navController: NavController) {
                 time = time,
                 session = session,
                 bookingDateTime = bookingDateTime
-            ) {
-                // Optional callback after download
-            }
+            ) {}
         }
-
-
-
-
     }
 }

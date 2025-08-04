@@ -119,7 +119,18 @@ dependencies {
     implementation("com.google.firebase:firebase-storage-ktx:21.0.2")
 
     implementation("androidx.compose.material3:material3:1.3.2")
+
+
+
+    implementation(libs.androidx.activity.compose)
 // or latest stable
+
+    // In your app-level build.gradle
+    implementation("androidx.compose.ui:ui:1.8.3")
+    implementation("androidx.compose.material:material:1.8.3")
+    implementation("androidx.compose.ui:ui-text:1.6.0")
+    implementation("androidx.compose.foundation:foundation:1.8.3")
+
 
 
 

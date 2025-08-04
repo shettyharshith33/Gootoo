@@ -16,11 +16,14 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -48,6 +51,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -55,8 +59,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.unit.times
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.airbnb.lottie.compose.LottieAnimation
@@ -93,6 +99,13 @@ fun OnBoardingScreen(
     val configuration = LocalConfiguration.current
     val screenWidth = configuration.screenWidthDp.dp
     val screenHeight = configuration.screenHeightDp.dp
+    val screenSize = DpSize(
+        width = configuration.screenWidthDp.dp,
+        height = configuration.screenHeightDp.dp
+    )
+    val density = LocalDensity.current
+
+    val statusBarHeight = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
     val context = LocalContext.current
 
     val activity = context as ComponentActivity
@@ -114,13 +127,14 @@ fun OnBoardingScreen(
     )
     {
         // App Name
-        Spacer(modifier = Modifier.height(screenHeight * 0.2f))
+
+        Spacer(modifier = Modifier.height(statusBarHeight + (screenHeight * 0.07f)))
         Text(
             buildAnnotatedString {
                 withStyle(
                     style = SpanStyle(
                         fontFamily = poppinsFontFamily,
-                        fontSize = 35.sp,
+                        fontSize = with(density) { (screenWidth * 0.09f).toSp() },
                         color = Color.Black,
                         fontWeight = FontWeight.SemiBold
                     )
@@ -134,7 +148,7 @@ fun OnBoardingScreen(
                         fontFamily = poppinsFontFamily,
                         color = gootooThemeBlue,
                         fontWeight = FontWeight.SemiBold,
-                        fontSize = 35.sp
+                        fontSize = with(density) { (screenWidth * 0.09f).toSp() }
                     )
                 )
                 {
@@ -153,13 +167,13 @@ fun OnBoardingScreen(
             LottieAnimation(
                 composition = composition,
                 iterations = LottieConstants.IterateForever,
-                modifier = Modifier.size(200.dp)
+                modifier = Modifier.size((screenWidth * 0.6f))
             )
         } else {
             // Show shimmer while loading
             Box(
                 modifier = Modifier
-                    .size(200.dp)
+                    .size(screenWidth * 0.6f)
                     .shimmer()
                     .background(Color.LightGray, shape = RoundedCornerShape(16.dp))
             )
@@ -172,6 +186,7 @@ fun OnBoardingScreen(
             )
             {
                 OutlinedTextField(
+                    modifier = Modifier.height(screenHeight * 0.09f),
                     leadingIcon = {
                         Icon(
                             imageVector = Icons.Default.Phone,
@@ -197,12 +212,12 @@ fun OnBoardingScreen(
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
                     shape = RoundedCornerShape(15.dp)
                 )
-                Spacer(modifier = Modifier.height(15.dp))
+                Spacer(modifier = Modifier.height((screenHeight * 0.04f)))
 
                 Button(
                     modifier = Modifier
-                        .width(130.dp)
-                        .height(50.dp),
+                        .width(screenHeight * 0.25f)
+                        .height(screenWidth * 0.1f),
                     colors = ButtonDefaults.buttonColors().copy(
                         containerColor = gootooThemeBlue
                     ),
@@ -231,7 +246,11 @@ fun OnBoardingScreen(
                     },
                     enabled = !isLoading,
                 ) {
-                    Text(if (isLoading) "Loading" else "Send OTP", color = Color.White)
+                    Text(
+                        if (isLoading) "Loading" else "Send OTP",
+                        fontFamily = poppinsFontFamily,
+                        color = Color.White,
+                        fontSize = with(density) { (screenWidth * 0.04f).toSp() })
                 }
 
 
@@ -239,6 +258,7 @@ fun OnBoardingScreen(
                 //SignUp Screen Navigation Button
                 Text(
                     "Click here to create account",
+                    fontSize = with(density) { (screenWidth * 0.035f).toSp() },
                     fontFamily = poppinsFontFamily,
                     color = Color.Blue,
                     fontWeight = FontWeight.SemiBold,
@@ -270,16 +290,14 @@ fun OnBoardingScreen(
             }
         }
     }
-    if (loadingAnimation)
-    {
+    if (loadingAnimation) {
         LoadingAnimation()
     }
 }
 
 
 @Composable
-fun LoadingAnimation()
-{
+fun LoadingAnimation() {
 
     Box(
         modifier = Modifier

@@ -15,12 +15,15 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.unit.times
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.sharathkolpe.gootoo.ui.theme.gootooThemeBlue
+import com.sharathkolpe.utils.BeforeLoginScreensNavigationObject
 import com.sharathkolpe.viewmodels.PatientHomeViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -31,6 +34,11 @@ fun HomeScreen(navController: NavController) {
     val isLoading by viewModel.isLoading.collectAsState()
     var searchQuery by remember { mutableStateOf("") }
     var selectedTab by remember { mutableStateOf(0) }
+
+    val configuration = LocalConfiguration.current
+    val screeHeight = configuration.screenHeightDp
+    val screeWidth = configuration.screenWidthDp
+    val statusBarHeight = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
     SetStatusBarColor(gootooThemeBlue, useDarkIcons = false)
 
     // Fetch doctors when HomeScreen loads
@@ -47,7 +55,7 @@ fun HomeScreen(navController: NavController) {
                     it.specialization.contains(searchQuery, ignoreCase = true)
         }
     }
-
+    Spacer(modifier = Modifier.height(statusBarHeight + (screeHeight * 0.001f .dp)))
     Scaffold(
         topBar = {
             TopAppBar(
@@ -66,7 +74,7 @@ fun HomeScreen(navController: NavController) {
                     selected = selectedTab == 1,
                     onClick = {
                         selectedTab = 1
-                        navController.navigate("bookings")
+                        navController.navigate(BeforeLoginScreensNavigationObject.MY_BOOKING_SCREEN)
                     },
                     icon = { Icon(Icons.Default.List, contentDescription = "Bookings") },
                     label = { Text("Bookings") }
@@ -78,7 +86,7 @@ fun HomeScreen(navController: NavController) {
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .padding(horizontal = 16.dp)
+                .padding(horizontal = screeWidth * 0.03.dp)
         ) {
             // 🔍 Search Field
             BasicTextField(

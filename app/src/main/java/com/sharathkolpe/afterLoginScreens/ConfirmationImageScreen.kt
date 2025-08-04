@@ -6,8 +6,11 @@ import android.graphics.*
 import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
+import android.util.Log
 import android.view.View
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -46,19 +49,42 @@ fun ConfirmationImageScreenVisible(
     bookingDateTime: String,
     onSaved: () -> Unit
 ) {
+
+
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val viewRef = remember { Ref<View>() }
     val configuration = LocalConfiguration.current
     val screenHeight = configuration.screenHeightDp
     val screenWidth = configuration.screenWidthDp
+    val MyTag = "TokenDownloadButton"
+
+
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission(),
+        onResult = { isGranted ->
+            if (isGranted) {
+                Toast.makeText(context, "Permission granted!", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(context, "Permission denied.", Toast.LENGTH_SHORT).show()
+            }
+        }
+    )
+
+    LaunchedEffect(Unit) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            permissionLauncher.launch(android.Manifest.permission.READ_MEDIA_IMAGES)
+        }
+    }
 
 
     Spacer(modifier = Modifier.height(screenHeight * 0.1.dp))
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
-        Column (modifier = Modifier.fillMaxSize(),
+        Column(
+            modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center){
+            verticalArrangement = Arrangement.Center
+        ) {
 
             AndroidView(
                 factory = { ctx ->
@@ -87,9 +113,25 @@ fun ConfirmationImageScreenVisible(
                         containerColor = gootooThemeBlue
                     ), onClick = {
                         scope.launch {
-                            viewRef.value?.let { view ->
-                                saveViewAsImage(view, context)
-                                onSaved()
+                            try {
+
+                                viewRef.value?.let { view ->
+                                    saveViewAsImage(view, context)
+                                    onSaved()
+                                }
+                            } catch (e: Exception) {
+                                Log.e(MyTag, "Error when trying to save image: ${e.message}", e)
+//                                Toast.makeText(context, "Download failed: ${e.message}", Toast.LENGTH_LONG).show()
+                                Toast.makeText(
+                                    context,
+                                    "Unable to Download Image...",
+                                    Toast.LENGTH_LONG
+                                ).show()
+                                Toast.makeText(
+                                    context,
+                                    "Please Take a ScreenShot",
+                                    Toast.LENGTH_LONG
+                                ).show()
                             }
                         }
                     }) {
@@ -106,6 +148,12 @@ fun ConfirmationImageScreenVisible(
                 fontWeight = FontWeight.Light,
                 fontFamily = poppinsFontFamily,
                 color = Color.DarkGray
+            )
+            Text(
+                "If download doesn't work, please take a screenshot...", fontSize = 12.sp,
+                fontWeight = FontWeight.Light,
+                fontFamily = poppinsFontFamily,
+                color = warningRed
             )
         }
     }
@@ -174,36 +222,130 @@ fun ConfirmationCardVisible(
 
 
 fun saveViewAsImage(view: View, context: Context) {
-    val bitmap = view.drawToBitmap(Bitmap.Config.ARGB_8888)
-    val fileName = "confirmation_${System.currentTimeMillis()}.png"
+    val TAG = "SaveTokenLog"
 
-    val contentValues = ContentValues().apply {
-        put(MediaStore.Images.Media.DISPLAY_NAME, fileName)
-        put(MediaStore.Images.Media.MIME_TYPE, "image/png")
-        put(MediaStore.Images.Media.DATE_ADDED, System.currentTimeMillis() / 1000)
-        put(MediaStore.Images.Media.TITLE, fileName)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            put(MediaStore.Images.Media.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS)
-            put(MediaStore.Images.Media.IS_PENDING, 1)
-        }
-    }
+    try {
+        Log.d(TAG, "Starting to capture bitmap...")
+        val bitmap = view.drawToBitmap(Bitmap.Config.ARGB_8888)
 
-    val resolver = context.contentResolver
-    val uri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
+        val fileName = "Token_${System.currentTimeMillis()}.png"
 
-    if (uri != null) {
-        resolver.openOutputStream(uri)?.use { out ->
-            bitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
+        val contentValues = ContentValues().apply {
+            put(MediaStore.Images.Media.DISPLAY_NAME, fileName)
+            put(MediaStore.Images.Media.MIME_TYPE, "image/png")
+            put(MediaStore.Images.Media.DATE_ADDED, System.currentTimeMillis() / 1000)
+            put(MediaStore.Images.Media.TITLE, fileName)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                put(MediaStore.Images.Media.RELATIVE_PATH, "Download/DoctorTokens")
+                put(MediaStore.Images.Media.IS_PENDING, 1)
+            }
         }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            contentValues.clear()
-            contentValues.put(MediaStore.Images.Media.IS_PENDING, 0)
-            resolver.update(uri, contentValues, null, null)
-        }
+        Log.d(TAG, "Inserting into MediaStore...")
+        val resolver = context.contentResolver
+        val uri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
 
-        Toast.makeText(context, "Saved to Downloads", Toast.LENGTH_SHORT).show()
-    } else {
-        Toast.makeText(context, "Failed to create image file", Toast.LENGTH_SHORT).show()
+        if (uri != null) {
+            Log.d(TAG, "MediaStore URI created: $uri")
+            resolver.openOutputStream(uri)?.use { out ->
+                val success = bitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
+                Log.d(TAG, "Bitmap compressed and written: $success")
+            }
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                contentValues.clear()
+                contentValues.put(MediaStore.Images.Media.IS_PENDING, 0)
+                resolver.update(uri, contentValues, null, null)
+                Log.d(TAG, "Marked IS_PENDING = 0")
+            }
+
+            Toast.makeText(context, "Token saved to Downloads/DoctorTokens", Toast.LENGTH_LONG)
+                .show()
+        } else {
+            Log.e(TAG, "Failed to create URI in MediaStore")
+            Toast.makeText(context, "Error saving token", Toast.LENGTH_SHORT).show()
+        }
+    } catch (e: Exception) {
+        Log.e(TAG, "Exception while saving image: ${e.message}", e)
+        Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_LONG).show()
     }
 }
+
+
+//fun saveViewAsImage(view: View, context: Context) {
+//    try {
+//        val bitmap = view.drawToBitmap(Bitmap.Config.ARGB_8888)
+//        val fileName = "Token_${System.currentTimeMillis()}.png"
+//
+//        val contentValues = ContentValues().apply {
+//            put(MediaStore.Images.Media.DISPLAY_NAME, fileName)
+//            put(MediaStore.Images.Media.MIME_TYPE, "image/png")
+//            put(MediaStore.Images.Media.DATE_ADDED, System.currentTimeMillis() / 1000)
+//            put(MediaStore.Images.Media.TITLE, fileName)
+//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+//                // ✅ Store to Downloads
+//                put(MediaStore.Images.Media.RELATIVE_PATH, "Download/DoctorTokens")
+//                put(MediaStore.Images.Media.IS_PENDING, 1)
+//            }
+//        }
+//
+//        val resolver = context.contentResolver
+//        val uri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
+//
+//        if (uri != null) {
+//            resolver.openOutputStream(uri)?.use { out ->
+//                bitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
+//            }
+//
+//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+//                contentValues.clear()
+//                contentValues.put(MediaStore.Images.Media.IS_PENDING, 0)
+//                resolver.update(uri, contentValues, null, null)
+//            }
+//
+//            Toast.makeText(context, "Token saved to Downloads/DoctorTokens", Toast.LENGTH_LONG).show()
+//        } else {
+//            Toast.makeText(context, "Error saving token", Toast.LENGTH_SHORT).show()
+//        }
+//    } catch (e: Exception) {
+//        Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_LONG).show()
+//        e.printStackTrace()
+//    }
+//}
+//
+
+
+//fun saveViewAsImage(view: View, context: Context) {
+//    val bitmap = view.drawToBitmap(Bitmap.Config.ARGB_8888)
+//    val fileName = "confirmation_${System.currentTimeMillis()}.png"
+//
+//    val contentValues = ContentValues().apply {
+//        put(MediaStore.Images.Media.DISPLAY_NAME, fileName)
+//        put(MediaStore.Images.Media.MIME_TYPE, "image/png")
+//        put(MediaStore.Images.Media.DATE_ADDED, System.currentTimeMillis() / 1000)
+//        put(MediaStore.Images.Media.TITLE, fileName)
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+//            put(MediaStore.Images.Media.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS)
+//            put(MediaStore.Images.Media.IS_PENDING, 1)
+//        }
+//    }
+//
+//    val resolver = context.contentResolver
+//    val uri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
+//
+//    if (uri != null) {
+//        resolver.openOutputStream(uri)?.use { out ->
+//            bitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
+//        }
+//
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+//            contentValues.clear()
+//            contentValues.put(MediaStore.Images.Media.IS_PENDING, 0)
+//            resolver.update(uri, contentValues, null, null)
+//        }
+//
+//        Toast.makeText(context, "Saved to Downloads", Toast.LENGTH_SHORT).show()
+//    } else {
+//        Toast.makeText(context, "Failed to create image file", Toast.LENGTH_SHORT).show()
+//    }
+//}
